@@ -33,4 +33,4 @@
 
 ## Контакты
 
-[Telegram] (t.me/@EDUHOPOr)
+[Telegram](https://t.me/EDUHOPOr)
