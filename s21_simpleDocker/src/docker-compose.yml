@@ -1,0 +1,12 @@
+services:
+  server:
+    build:
+      context: ./
+      dockerfile: pt5.Dockerfile
+
+  nginx:
+    image: nginx
+    ports:
+      - 80:8080
+    volumes:
+      - ./nginx/nginx6.conf:/etc/nginx/nginx.conf
