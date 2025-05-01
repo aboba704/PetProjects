@@ -20,6 +20,12 @@
 - **Технологии**: nginx, FastCgi, docker, dockle, docker-compose
 - **Сслыка на репозиторий**: [GitHub](https://github.com/aboba704/PetProjects/tree/main/s21_simpleDocker)
 
+### s21_LinuxBash
+
+Основы работы с bash-сценариями в Linux и исследование системы.
+- **Технологии**: Bash, docker
+- **Сслыка на репозиторий**: [GitHub](https://github.com/aboba704/PetProjects/tree/main/s21_LinuxBash)
+
 ## Проекты по разработке:
 
 ### s21_stringPlus
