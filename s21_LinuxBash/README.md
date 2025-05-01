@@ -1,4 +1,4 @@
-# Linux Monitoring v1.0
+# Linux Bash
 
 Скрипты запускаются через докер. `docker build -t do3 .`, `docker run -it do3 /bin/bash` \
 Dockerfile:
