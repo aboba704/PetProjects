@@ -1,4 +1,4 @@
-# DO6 Basic CI/CD
+# Basic CI/CD
 
 ## Part 1. Настройка gitlab-runner
 

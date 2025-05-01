@@ -1,0 +1,50 @@
+services:
+  grafana:
+    image: grafana/grafana:8.5.3-ubuntu
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus:v2.36.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./html:/usr/share/nginx/html
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+    ports:
+      - "8081:8081"
+    networks:
+      - monitoring
+
+  script-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: script
+    volumes:
+      - ../02:/DO4/02
+      - ../common:/DO4/common
+      - ../09/scripts/metrics.sh:/DO4/09/metrics.sh
+      - ./html:/DO4/metrics
+    working_dir: /DO4/02
+    # command: bash main.sh az az.az 100Mb && bash 09/metrics.sh
+    command: bash 09/metrics.sh && stress -c 2 -i 1 -m 1 --vm-bytes 32M -t 10s
+    stdin_open: true
+    tty: true
+    networks:
+      - monitoring
+
+networks:
+  monitoring:

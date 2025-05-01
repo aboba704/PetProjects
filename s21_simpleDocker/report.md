@@ -1,4 +1,4 @@
-# DO4 Simple Docker
+# Simple Docker
 
 ## Part 1. Готовый докер
 

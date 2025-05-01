@@ -1,0 +1,62 @@
+services:
+  grafana:
+    image: grafana/grafana:8.5.3-ubuntu
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring
+  
+  prometheus:
+    image: prom/prometheus:v2.36.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - monitoring
+
+  script-runner:
+    image: ubuntu:20.04
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    container_name: script
+    volumes:
+      - ../02:/DO4/02
+      - ../common:/DO4/common
+    working_dir: /DO4/02
+    # command: bash main.sh az az.az 100Mb
+    stdin_open: true
+    tty: true
+    networks:
+      - monitoring
+  
+  iperf-server:
+    image: networkstatic/iperf3
+    container_name: server
+    ports:
+      - "5201:5201"
+    command: -s
+    networks:
+      - iperf-net
+      - monitoring
+
+networks:
+  monitoring:
+  iperf-net:
+    driver: bridge
