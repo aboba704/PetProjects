@@ -1,5 +1,23 @@
 # Linux Monitoring v1.0
 
+Скрипты запускаются через докер. `docker build -t do3 .`, `docker run -it do3 /bin/bash` \
+Dockerfile:
+
+```Dockerfile
+FROM ubuntu:20.04
+
+RUN apt-get update && \
+    apt-get install -y systemd lsb-release iproute2 bc && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /DO3
+
+COPY . /DO3
+
+RUN chmod +x */*.sh
+```
+
 ## Part 1. Проба пера
 
 Напиши bash-скрипт. Скрипт запускается с одним параметром. Параметр текстовый.  
@@ -52,6 +70,8 @@
 При вводе совпадающих значений должно выводиться сообщение, описывающее проблему, и предложение повторно вызвать скрипт.  
 После вывода сообщения программа должна корректно завершиться.
 
+![img](src/03/image.png)
+
 ## Part 4. Конфигурирование визуального оформления вывода для скрипта исследования системы
 
 Напиши bash-скрипт. За основу возьми скрипт из [**Part 3**]. Обозначения цветов аналогичные.  
@@ -81,6 +101,8 @@ Column 1 font color = default (white)
 Column 2 background = default (red)
 Column 2 font color = default (blue)
 ```
+
+![img](src/04/image.png)
 
 ## Part 5. Исследование файловой системы
 
@@ -123,3 +145,5 @@ TOP 10 executable files of the maximum size arranged in descending order (path, 
 etc up to 10  
 Script execution time (in seconds) = 1.5
 ```
+
+![img](src/05/image.png)

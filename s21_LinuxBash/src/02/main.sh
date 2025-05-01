@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source utils.sh
+source info.sh
 
 info=$(get_sys_info)
 
