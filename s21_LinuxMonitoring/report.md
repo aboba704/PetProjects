@@ -95,7 +95,7 @@
 
 Открой веб-интерфейс утилиты на локальной машине.
 
-![img](img/01.png)
+![img](src/06/image.png)
 
 ## Part 7. **Prometheus** и **Grafana**
 

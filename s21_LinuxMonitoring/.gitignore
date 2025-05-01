@@ -1,5 +1,5 @@
 src/01/test/*
-*.log
+# *.log
 .DS_Store
-logs
-*.html
+# logs
+# *.html
