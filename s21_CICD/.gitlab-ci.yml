@@ -1,0 +1,44 @@
+stages:
+  - build
+  - code-style
+  - test
+  - deploy
+
+build-job:
+  stage: build
+  script:
+    - cd src/code
+    - make
+  artifacts:
+    paths:
+      - src/code/build/DO
+    expire_in: 30 days
+  after_script:
+    - bash src/telegram.sh build-job
+
+style-job:
+  stage: code-style
+  script:
+    - clang-format -n src/code/main.c
+  after_script:
+    - bash src/telegram.sh style-job
+  
+test-job:
+  stage: test
+  needs: [build-job, style-job]
+  script:
+    - cd src/code
+    - bash test.sh
+  after_script:
+    - bash src/telegram.sh test-job
+
+deploy-job:
+  stage: deploy
+  script:
+    - cd src/code
+    - make
+    - cd ../ 
+    - bash deploy.sh
+  when: manual
+  after_script:
+    - bash src/telegram.sh deploy-job
