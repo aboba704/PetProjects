@@ -1,0 +1,31 @@
+Vagrant.configure("2") do |config|
+  # Общие настройки для всех машин
+  config.vm.box = "ubuntu/focal64"
+
+  # Настройка manager01 (менеджер Swarm)
+  config.vm.define "manager01" do |manager|
+    manager.vm.hostname = "manager01"
+    manager.vm.network "private_network", ip: "192.168.56.10"
+    manager.vm.network "forwarded_port", guest: 8087, host: 8087, id: "gateway"
+    manager.vm.network "forwarded_port", guest: 8081, host: 8081, id: "session"
+    manager.vm.network "forwarded_port", guest: 9000, host: 9000, id: "portainer"
+    manager.vm.provision "shell", path: "src/scripts/install-docker.sh"
+    manager.vm.provision "shell", path: "src/scripts/init-swarm.sh"
+  end
+
+  # Настройка worker01 (воркер Swarm)
+  config.vm.define "worker01" do |worker|
+    worker.vm.hostname = "worker01"
+    worker.vm.network "private_network", ip: "192.168.56.11"
+    worker.vm.provision "shell", path: "src/scripts/install-docker.sh"
+    worker.vm.provision "shell", path: "src/scripts/join-swarm.sh"
+  end
+
+  # Настройка worker02 (воркер Swarm)
+  config.vm.define "worker02" do |worker|
+    worker.vm.hostname = "worker02"
+    worker.vm.network "private_network", ip: "192.168.56.12"
+    worker.vm.provision "shell", path: "src/scripts/install-docker.sh"
+    worker.vm.provision "shell", path: "src/scripts/join-swarm.sh"
+  end
+end

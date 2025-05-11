@@ -1,0 +1,216 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    networks:
+      - app
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: users_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - /vagrant/src/services/database:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    networks:
+      - app
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  session:
+    image: lunchlma/session-service
+    networks:
+      - app
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: users_db
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  hotel:
+    image: lunchlma/hotel-service
+    networks:
+      - app
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: hotels_db
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  payment:
+    image: lunchlma/payment-service
+    networks:
+      - app
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: payments_db
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  loyalty:
+    image: lunchlma/loyalty-service
+    networks:
+      - app
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: balances_db
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  report:
+    image: lunchlma/report-service
+    networks:
+      - app
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: statistics_db
+      RABBIT_MQ_HOST: rabbitmq
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: guest
+      RABBIT_MQ_PASSWORD: guest
+      RABBIT_MQ_QUEUE_NAME: messagequeue
+      RABBIT_MQ_EXCHANGE: messagequeue-exchange
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  booking:
+    image: lunchlma/booking-service
+    networks:
+      - app
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: reservations_db
+      RABBIT_MQ_HOST: rabbitmq
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: guest
+      RABBIT_MQ_PASSWORD: guest
+      RABBIT_MQ_QUEUE_NAME: messagequeue
+      RABBIT_MQ_EXCHANGE: messagequeue-exchange
+      HOTEL_SERVICE_HOST: hotel
+      HOTEL_SERVICE_PORT: 8082
+      PAYMENT_SERVICE_HOST: payment
+      PAYMENT_SERVICE_PORT: 8084
+      LOYALTY_SERVICE_HOST: loyalty
+      LOYALTY_SERVICE_PORT: 8085
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  gateway:
+    image: lunchlma/gateway-service
+    networks:
+      app:
+    depends_on:
+      - hotel
+      - booking
+      - payment
+      - loyalty
+      - report
+      - session
+      - postgres
+      - rabbitmq
+    environment:
+      SESSION_SERVICE_HOST: session
+      SESSION_SERVICE_PORT: 8081
+      HOTEL_SERVICE_HOST: hotel
+      HOTEL_SERVICE_PORT: 8082
+      BOOKING_SERVICE_HOST: booking
+      BOOKING_SERVICE_PORT: 8083
+      PAYMENT_SERVICE_HOST: payment
+      PAYMENT_SERVICE_PORT: 8084
+      LOYALTY_SERVICE_HOST: loyalty
+      LOYALTY_SERVICE_PORT: 8085
+      REPORT_SERVICE_HOST: report
+      REPORT_SERVICE_PORT: 8086
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+  
+  nginx:
+    image: nginx:latest
+    networks:
+      - app
+    ports:
+      - "8081:8081"
+      - "8087:8087"
+    volumes:
+      - /vagrant/src/nginx/nginx.conf:/etc/nginx/nginx.conf
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+networks:
+  app:
+    driver: overlay
+    attachable: true # Это позволит подключать обычные контейнеры
+
+volumes:
+  postgres_data:
