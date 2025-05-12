@@ -195,8 +195,8 @@ session:
 `vagrant up` \
 `vagrant ssh manager01` \
 `sudo docker stack deploy -c /vagrant/docker-compose.yml do7` 
-<img src="src/img/07.png" width="300">
 
+<img src="src/img/07.png" width="600">
 
 #### 4. Настрой прокси на базе nginx для доступа к gateway service и session service по оверлейной сети. Сами gateway service и session service сделай недоступными напрямую.
 
