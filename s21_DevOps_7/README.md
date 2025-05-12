@@ -74,11 +74,15 @@ Vagrant.configure("2") do |config|
 
 #### 2. Зайди через консоль внутрь виртуальной машины и удостоверься, что исходный код встал, куда нужно. Останови и уничтожь виртуальную машину.
 
-`vagrant up`, `vagrant ssh`
+`vagrant up`
+
+`vagrant ssh`
 
 <img src="src/img/05.png" width="600">
 
 `vagrant halt`
+
+`vagrant destroy`
 
 ### Part 3. Создание простейшего docker swarm
 
