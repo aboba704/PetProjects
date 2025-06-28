@@ -1,0 +1,13 @@
+server = false
+data_dir = "/opt/consul"
+bind_addr = "{{ consul_ip }}"
+advertise_addr = "{{ consul_ip }}"
+client_addr = "0.0.0.0"
+retry_join = ["192.168.56.10"]
+
+ports {
+    grpc = 8502
+}
+connect {
+    enabled = true
+}

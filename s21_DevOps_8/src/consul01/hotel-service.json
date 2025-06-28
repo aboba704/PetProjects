@@ -1,0 +1,23 @@
+{
+  "service": {
+    "name": "hotel-service",
+    "port": 8082,
+    "check": {
+      "http": "http://localhost:8082/hotels",
+      "interval": "10s",
+      "timeout": "1s"
+    },
+    "connect": {
+      "sidecar_service": {
+        "proxy": {
+          "upstreams": [
+            {
+              "destination_name": "postgres",
+              "local_bind_port": 5432
+            }
+          ]
+        }
+      }
+    }
+  }
+}

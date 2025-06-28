@@ -1,0 +1,41 @@
+Vagrant.configure("2") do |config|
+  # Общие настройки для всех машин
+  config.vm.box = "ubuntu/focal64"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+    sudo systemctl restart sshd
+  SHELL
+
+  config.vm.define "consul" do |consul|
+    consul.vm.hostname = "consul"
+    consul.vm.network "private_network", ip: "192.168.56.10"
+    consul.vm.network "forwarded_port", guest: 8500, host: 8500, id: "consul_ui"
+  end
+
+  config.vm.define "api" do |api|
+    api.vm.hostname = "api"
+    api.vm.network "private_network", ip: "192.168.56.11"
+    api.vm.network "forwarded_port", guest: 8082, host: 8082, id: "app"
+    api.vm.provider "virtualbox" do |v| # for docker-compose better performance
+      v.memory = "4096"
+    end
+  end
+
+  config.vm.define "manager" do |manager|
+    manager.vm.hostname = "manager"
+    manager.vm.network "private_network", ip: "192.168.56.12"
+    manager.vm.provision "shell", inline: <<-SHELL
+      sudo apt-get update && sudo apt-get install -y ansible
+      # ssh-keygen -C do8
+      # ssh-copy-id -i ~/.ssh/id_rsa.pub 192.168.56.10
+      # ansible -i inventory.ini nodes -m ping
+      # ansible-playbook -i inventory.ini playbook.yml
+      SHELL
+  end
+
+  config.vm.define "db" do |db|
+    db.vm.hostname = "db"
+    db.vm.network "private_network", ip: "192.168.56.13"
+  end
+end

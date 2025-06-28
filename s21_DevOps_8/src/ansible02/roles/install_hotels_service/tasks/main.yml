@@ -1,0 +1,57 @@
+---
+- name: copy hotel service code
+  copy:
+    src: /vagrant/services/hotel-service/
+    dest: /opt/hotel-service/
+    owner: vagrant
+    group: vagrant
+    mode: "0755"
+
+- name: install openjdk-8-jdk
+  apt:
+    name:
+      - openjdk-8-jdk
+    state: present
+    update_cache: yes
+
+- name: set environment variables
+  lineinfile:
+    path: /etc/environment
+    line: "{{ item }}"
+  loop:
+    - "POSTGRES_HOST=127.0.0.1"
+    - "POSTGRES_PORT=5432"
+    - "POSTGRES_DB=hotels_db"
+    - "POSTGRES_USER=postgres"
+    - "POSTGRES_PASSWORD=postgres"
+
+- name: source environment variables
+  shell: source /etc/environment
+  args:
+    executable: /bin/bash
+
+- name: download dependencies
+  command: ./mvnw dependency:go-offline
+  args:
+    chdir: /opt/hotel-service
+
+- name: build the hotel service .jar file
+  command: ./mvnw package -DskipTests
+  args:
+    chdir: /opt/hotel-service
+
+- name: hotel-service dir is writable
+  file:
+    path: /opt/hotel-service
+    owner: vagrant
+    group: vagrant
+    recurse: true
+
+- name: run hotel service
+  shell: |
+    nohup java -jar target/hotel-service-0.0.1-SNAPSHOT.jar \
+      >> hotel-service.log 2>&1 &
+    echo $! > hotel-service.pid
+  args:
+    chdir: /opt/hotel-service
+    executable: /bin/bash
