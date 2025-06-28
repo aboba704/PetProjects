@@ -2,10 +2,16 @@
 
 ## Проекты по DevOps:
 
+### s21_DevOps_8
+
+Использование инструментов автоматизации для провизии узлов.
+- **Технологии**: ansible, consul, PostgreSQL
+- **Сслыка на репозиторий**: [GitHub](https://github.com/aboba704/PetProjects/tree/main/s21_DevOps_8)
+
 ### s21_DevOps_7
 
 Использование инструментов docker compose и docker swarm для совместного запуска контейнеров и их оркестровки простым способом.
-- **Технологии**: docker-compose, vagrant, docker swarm, nginx, bash
+- **Технологии**: docker-compose, vagrant, docker swarm, nginx
 - **Сслыка на репозиторий**: [GitHub](https://github.com/aboba704/PetProjects/tree/main/s21_DevOps_7)
 
 ### s21_LinuxMonitoring
